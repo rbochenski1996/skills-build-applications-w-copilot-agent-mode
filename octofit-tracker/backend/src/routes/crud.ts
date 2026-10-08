@@ -1,7 +1,14 @@
 import { Router } from 'express';
 import type { Model } from 'mongoose';
 
-export function crudRouter(model: Model<any>): Router {
+// Only allow-listed fields can be written by clients.
+function pick(body: Record<string, unknown> | undefined, fields: string[]) {
+  const out: Record<string, unknown> = {};
+  for (const f of fields) if (body && f in body) out[f] = body[f];
+  return out;
+}
+
+export function crudRouter(model: Model<any>, writable: string[]): Router {
   const router = Router();
 
   router.get('/', async (_req, res) => {
@@ -15,12 +22,12 @@ export function crudRouter(model: Model<any>): Router {
   });
 
   router.post('/', async (req, res) => {
-    const doc = await model.create(req.body);
+    const doc = await model.create(pick(req.body, writable));
     res.status(201).json(doc);
   });
 
   router.put('/:id', async (req, res) => {
-    const doc = await model.findByIdAndUpdate(req.params.id, req.body, {
+    const doc = await model.findByIdAndUpdate(req.params.id, pick(req.body, writable), {
       new: true,
       runValidators: true,
     });

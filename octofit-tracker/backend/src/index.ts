@@ -26,14 +26,15 @@ app.get('/api/', (_req, res) => {
   });
 });
 
-app.use('/api/users', crudRouter(User));
-app.use('/api/teams', crudRouter(Team));
-app.use('/api/activities', crudRouter(Activity));
-app.use('/api/leaderboard', crudRouter(Leaderboard));
-app.use('/api/workouts', crudRouter(Workout));
+app.use('/api/users', crudRouter(User, ['name', 'email', 'team']));
+app.use('/api/teams', crudRouter(Team, ['name', 'description']));
+app.use('/api/activities', crudRouter(Activity, ['user', 'type', 'durationMinutes', 'calories', 'date']));
+app.use('/api/leaderboard', crudRouter(Leaderboard, ['user', 'team', 'points']));
+app.use('/api/workouts', crudRouter(Workout, ['name', 'description', 'difficulty', 'durationMinutes']));
 
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-  const status = err.name === 'ValidationError' || err.name === 'CastError' ? 400 : 500;
+  const status =
+    err.code === 11000 ? 409 : err.name === 'ValidationError' || err.name === 'CastError' ? 400 : 500;
   res.status(status).json({ error: err.message });
 });
 
