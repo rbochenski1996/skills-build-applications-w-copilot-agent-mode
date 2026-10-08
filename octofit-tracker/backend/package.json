@@ -5,7 +5,7 @@
   "description": "OctoFit Tracker logic tier (Express + TypeScript + Mongoose)",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/index.js",
     "seed": "tsx src/scripts/seed.ts"
